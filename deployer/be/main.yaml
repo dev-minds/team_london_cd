@@ -1,0 +1,35 @@
+---
+- name: Deployment book  
+  hosts: app 
+  remote_user: centos 
+  become: true 
+
+  tasks: 
+    - name: Testing test 
+      ping: 
+    
+    - name: Create a directory if it does not exist
+      file:
+        path: /home/centos/app_point
+        state: directory
+        mode: '0755'
+    
+    - name: Copy file with owner and permissions
+      copy:
+        src: ./docker-compose.yaml
+        dest: /home/centos/app_point
+        owner: centos
+        group: centos
+        mode: '0644'
+
+    - name: Stop running service 
+      shell: /usr/local/bin/docker-compose -f /home/centos/app_point/docker-compose.yaml stop 
+    
+    - name: Remove all images 
+      shell: /usr/local/bin/docker-compose -f /home/centos/app_point/docker-compose.yaml rm -f 
+
+    - name: Spinup Stack  
+      shell: /usr/local/bin/docker-compose -f /home/centos/app_point/docker-compose.yaml up -d 
+
+    # - name: TScale compose service  
+    #   shell: /usr/local/bin/docker-compose -f /home/centos/app_point/docker-compose.yaml scale shopizer=3 

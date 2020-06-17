@@ -1,0 +1,64 @@
+{
+    "variables": {
+        "vpc": "",
+        "subnet": "",
+        "ami_name": "BackendServerAmi_{{isotime \"02-Jan-06 03_04_05\"}}"
+    },
+
+    "builders": [{
+        "name": "BackendServerAmi - DMINDS",
+        "ami_description": "Amazon Linux CIS with Cloudwatch Logs agent",
+        "region": "eu-west-1",
+        "type": "amazon-ebs",
+        "associate_public_ip_address": "true",
+        "vpc_id": "{{user `vpc`}}",
+        "subnet_id": "{{user `subnet`}}",
+
+        "source_ami": "ami-0b850cf02cc00fdc8",
+        "instance_type": "t2.micro",
+        "ssh_username": "centos",
+        "ami_name": "{{user `ami_name`}}",
+        "launch_block_device_mappings": [{
+            "device_name": "/dev/sda1",
+            "volume_size": 25,
+            "volume_type": "gp2",
+            "delete_on_termination": true
+        }],
+
+        "tags": {
+          "Name": "{{user `ami_name`}}"
+        },
+        "run_tags": {
+          "Name": "{{user `ami_name`}}"
+        },
+        "run_volume_tags": {
+          "Name": "{{user `ami_name`}}"
+        },
+        "snapshot_tags": {
+          "Name": "{{user `ami_name`}}"
+        }
+      }],
+
+      "provisioners": [
+          {
+            "type": "shell",
+            "inline": [
+              "ping -c5 google.com",
+              "sudo yum update -y",
+              "sudo yum install -y yum-utils device-mapper-persistent-data lvm2",
+              "sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo",
+              "sudo yum install -y docker-ce",
+              "sudo yum-config-manager --enable docker-ce-edge",
+              "sudo yum-config-manager --enable docker-ce-test",
+              "sudo usermod -aG docker centos",
+              "sudo systemctl start docker",
+              "sudo systemctl enable docker",
+              "sudo yum install wget -y",
+              "sudo wget -O https://github.com/docker/compose/releases/download/1.26.0/docker-compose-Linux-x86_64 /usr/local/bin/docker-compose",
+              "chmod +x /usr/local/bin/docker-compose"
+            ]
+          }
+      ]
+}
+
+

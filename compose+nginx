@@ -1,0 +1,43 @@
+upstream shop {
+    server 10.10.5.169:8080;
+}
+
+server {
+    listen      80;
+    server_name shop.dev-minds.com;
+
+    access_log  /var/log/nginx/shop.access.log;
+    error_log   /var/log/nginx/shop.error.log;
+
+    proxy_buffers 16 64k;
+    proxy_buffer_size 128k;
+
+    location / {
+        proxy_pass  http://shop;
+        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
+        proxy_redirect off;
+
+        proxy_set_header    Host            $host;
+        proxy_set_header    X-Real-IP       $remote_addr;
+        proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header    X-Forwarded-Proto $scheme;
+    }
+
+}
+
+#########################
+# Deploy Jenkins DevOps container locally
+version: '3.2'
+
+services:
+  shopizer:
+    image: phelun/shopizer-local:v0.1
+    hostname: shop
+    ports:
+    - "8080:8080/tcp"
+    networks:
+    - net_box
+
+networks:
+  net_box:
+    driver: bridge

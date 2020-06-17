@@ -1,0 +1,15 @@
+version: '3.2'
+
+services:
+  shopizer:
+    image: phelun/shopizer-local:v0.1
+    hostname: shop
+    ports:
+    - "8081:8080/tcp"
+    networks:
+    - net_box
+
+networks:
+  net_box:
+    driver: bridge
+
