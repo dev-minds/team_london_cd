@@ -66,9 +66,7 @@ node() {
 
     stage('Prep Mangement VPC') {
         echo "${seperator60}\n${seperator20} Simple deployment \n${seperator60}"
-        withCredentials(
-            [[
-            $class: 'AmazonWebServicesCredentialsBinding',
+        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
             credentialsId: "admin_preprod",
             accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
